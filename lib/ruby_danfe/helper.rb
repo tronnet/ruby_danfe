@@ -2,8 +2,9 @@ module RubyDanfe
   class Helper
     def self.numerify(number, decimals = 2)
       return "" if !number || number == ""
+      number = number.gsub(",", ".")
       int, frac = ("%.#{decimals}f" % number).split(".")
-      int.gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1\.")
+      int.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1\.")
       int + "," + frac
     end
 
