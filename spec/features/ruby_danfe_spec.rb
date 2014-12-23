@@ -13,6 +13,14 @@ describe "RubyDanfe generated pdf files" do
     File.delete(pdf) if File.exist?(pdf)
   end
 
+  it "renders a NF-e with invalid float" do
+    expect(File.exist?(output_pdf)).to be false
+
+    RubyDanfe.generate(output_pdf, "#{base_dir}nfe_with_invalid_float.xml")
+
+    expect("#{base_dir}nfe_with_invalid_float.xml.fixture.pdf").to be_same_file_as(output_pdf)
+  end
+
   it "renders a basic NF-e with namespace" do
     expect(File.exist?(output_pdf)).to be false
 
