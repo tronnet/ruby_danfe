@@ -17,10 +17,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "nokogiri"
-  spec.add_dependency "prawn"
+  spec.add_dependency "prawn", "0.11.1"
   spec.add_dependency "barby"
 
   spec.add_development_dependency "pry"
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec", ">= 3.0.0"
   spec.add_development_dependency "simplecov"
 end
