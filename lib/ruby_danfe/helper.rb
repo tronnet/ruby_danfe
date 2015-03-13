@@ -23,5 +23,33 @@ module RubyDanfe
     def self.invert(y)
       28.7.cm - y
     end
+
+    def self.get_emit_date(xml)
+      if !xml['ide/dEmi'].blank?
+        dh_emi = xml['ide/dEmi']
+      elsif !xml['ide/dhEmi'].blank?
+        dh_emi = xml.css('dhEmi').text
+        dh_emi = Date.parse(dh_emi).strftime('%Y-%m-%d')
+      end
+    end
+
+    def self.get_out_date(xml)
+      if !xml['ide/dSaiEnt'].blank?
+        dh_out = xml['ide/dSaiEnt']
+      elsif !xml['ide/dhSaiEnt'].blank?
+        dh_out = xml.css('dhSaiEnt').text
+        dh_out = Date.parse(dh_out).strftime('%Y-%m-%d')
+      end
+    end
+
+    def self.get_out_hour(xml)
+      if !xml['ide/dSaiEnt'].blank?
+        dh_out = xml['ide/dSaiEnt']
+        dh_out = Date.parse(dh_out).strftime('%d/%m/%Y')
+      elsif !xml['ide/dhSaiEnt'].blank?
+        dh_out = xml.css('dhSaiEnt').text
+        dh_out = Time.parse(dh_out).strftime("%H:%M:%S")
+      end
+    end
   end
 end
