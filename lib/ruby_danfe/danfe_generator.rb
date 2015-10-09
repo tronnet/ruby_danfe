@@ -7,6 +7,15 @@ module RubyDanfe
       @vol = 0
     end
 
+    def freight_mode(f_type)
+      case f_type
+        when "0" then "0 - Emitente"
+        when "1" then "1 - Destinatário/remetente"
+        when "2" then "2 - Terceiros"
+        when "9" then "9 - Sem frete"
+      end
+    end
+
     def generatePDF
       @pdf.repeat :all do
         render_canhoto
@@ -33,7 +42,8 @@ module RubyDanfe
 
     private
     def render_canhoto
-      @pdf.ibox 0.85, 16.10, 0.25, 0.42, "RECEBEMOS DE " + @xml['emit/xNome'] + " OS PRODUTOS CONSTANTES DA NOTA FISCAL INDICADA ABAIXO"
+      receb = "EMISSÃO: #{Helper.date_parser(@xml['ide/dhEmi'][0..9])} VALOR TOTAL: R$ #{@xml['total/ICMSTot/vProd']} DESTINATÁRIO: #{@xml['dest/xNome']} - #{@xml['dest/enderDest/xLgr']}, #{@xml['dest/enderDest/nro']} #{@xml['dest/enderDest/xBairro']} #{@xml['dest/enderDest/xMun']}-#{@xml['dest/enderDest/UF']}"
+      @pdf.ibox 0.85, 16.10, 0.25, 0.42, "RECEBEMOS DE #{@xml['emit/xNome']} OS PRODUTOS CONSTANTES DA NOTA FISCAL INDICADA ABAIXO:", receb, {:size => 6}
       @pdf.ibox 0.85, 4.10, 0.25, 1.27, "DATA DE RECEBIMENTO"
       @pdf.ibox 0.85, 12.00, 4.35, 1.27, "IDENTIFICAÇÃO E ASSINATURA DO RECEBEDOR"
 
@@ -49,7 +59,7 @@ module RubyDanfe
         @xml['enderEmit/xLgr'] + ", " + @xml['enderEmit/nro'] + "\n" +
         @xml['enderEmit/xBairro'] + " - " + @xml['enderEmit/CEP'] + "\n" +
         @xml['enderEmit/xMun'] + "/" + @xml['enderEmit/UF'] + "\n" +
-        @xml['enderEmit/fone'] + " " + @xml['enderEmit/email'], {:align => :center, :valign => :center}
+        @xml['enderEmit/fone'] + " " + @xml['enderEmit/email'], {:size => 9, :align => :center, :valign => :center}
 
       @pdf.ibox 3.92, 3.08, 7.71, 2.54
 
@@ -64,31 +74,31 @@ module RubyDanfe
       @pdf.ibox 2.20, 10.02, 10.79, 2.54
       @pdf.ibarcode 1.50, 8.00, 10.9010, 4.44, @xml['chNFe']
       @pdf.ibox 0.85, 10.02, 10.79, 4.74, "CHAVE DE ACESSO", @xml['chNFe'].gsub(/(\d)(?=(\d\d\d\d)+(?!\d))/, "\\1 "), {:style => :bold, :align => :center}
-      @pdf.ibox 0.85, 10.02, 10.79, 5.60 , '', "Consulta de autenticidade no portal nacional da NF-e www.nfe.fazenda.gov.br/portal ou no site da Sefaz Autorizadora", {:align => :center, :size => 8}
-      @pdf.ibox 0.85, 10.54, 0.25, 6.46, "NATUREZA DA OPERAÇÃO", @xml['ide/natOp']
-      @pdf.ibox 0.85, 10.02, 10.79, 6.46, "PROTOCOLO DE AUTORIZAÇÃO DE USO", @xml['infProt/nProt'] + ' ' + @xml['infProt/dhRecbto'], {:align => :center}
+      @pdf.ibox 0.85, 10.02, 10.79, 5.60 , '', 'Consulta de autenticidade no portal nacional da NF-e' + "\n" 'www.nfe.fazenda.gov.br/portal ou no site da Sefaz Autorizadora', {:align => :center, :size => 8}
+      @pdf.ibox 0.85, 10.54, 0.25, 6.46, "NATUREZA DA OPERAÇÃO", @xml['ide/natOp'], {:style => :bold}
+      @pdf.ibox 0.85, 10.02, 10.79, 6.46, "PROTOCOLO DE AUTORIZAÇÃO DE USO", "#{@xml['infProt/nProt']} - #{@xml['infProt/dhRecbto']}", {:style => :bold, :align => :center}
 
-      @pdf.ibox 0.85, 6.86, 0.25, 7.31, "INSCRIÇÃO ESTADUAL", @xml['emit/IE']
-      @pdf.ibox 0.85, 6.86, 7.11, 7.31, "INSC.ESTADUAL DO SUBST. TRIBUTÁRIO", @xml['emit/IE_ST']
-      @pdf.ibox 0.85, 6.84, 13.97, 7.31, "CNPJ", @xml['emit/CNPJ']
+      @pdf.ibox 0.85, 6.86, 0.25, 7.31, "INSCRIÇÃO ESTADUAL", @xml['emit/IE'], {:style => :bold}
+      @pdf.ibox 0.85, 6.86, 7.11, 7.31, "INSC.ESTADUAL DO SUBST. TRIBUTÁRIO", @xml['emit/IE_ST'], {:style => :bold}
+      @pdf.ibox 0.85, 6.84, 13.97, 7.31, "CNPJ", Helper.as_cnpj_cpf(@xml['emit/CNPJ']), {:style => :bold}
     end
 
     def render_titulo
       @pdf.ititle 0.42, 10.00, 0.25, 8.16, "DESTINATÁRIO / REMETENTE"
 
-      @pdf.ibox 0.85, 12.32, 0.25, 8.58, "NOME/RAZÃO SOCIAL", @xml['dest/xNome']
-      @pdf.ibox 0.85, 5.33, 12.57, 8.58, "CNPJ/CPF", @xml['dest/CNPJ'] if @xml['dest/CNPJ'] != ''
-      @pdf.ibox 0.85, 5.33, 12.57, 8.58, "CNPJ/CPF", @xml['dest/CPF'] if @xml['dest/CPF'] != ''
-      @pdf.idate 0.85, 2.92, 17.90, 8.58, "DATA DA EMISSÃO", Helper.get_emit_date(@xml), {:align => :right}
-      @pdf.ibox 0.85, 10.16, 0.25, 9.43, "ENDEREÇO", @xml['enderDest/xLgr'] + " " + @xml['enderDest/nro']
-      @pdf.ibox 0.85, 4.83, 10.41, 9.43, "BAIRRO", @xml['enderDest/xBairro']
-      @pdf.ibox 0.85, 2.67, 15.24, 9.43, "CEP", @xml['enderDest/CEP']
-      @pdf.idate 0.85, 2.92, 17.90, 9.43, "DATA DA SAÍDA/ENTRADA", Helper.get_out_date(@xml), {:align => :right}
-      @pdf.ibox 0.85, 7.11, 0.25, 10.28, "MUNICÍPIO", @xml['enderDest/xMun']
-      @pdf.ibox 0.85, 4.06, 7.36, 10.28, "FONE/FAX", @xml['enderDest/fone']
-      @pdf.ibox 0.85, 1.14, 11.42, 10.28, "UF", @xml['enderDest/UF']
-      @pdf.ibox 0.85, 5.33, 12.56, 10.28, "INSCRIÇÃO ESTADUAL", @xml['dest/IE']
-      @pdf.ibox 0.85, 2.92, 17.90, 10.28, "HORA DE SAÍDA", Helper.get_out_hour(@xml), {:align => :right}
+      @pdf.ibox 0.85, 12.32, 0.25, 8.58, "NOME/RAZÃO SOCIAL", @xml['dest/xNome'], {:style => :bold}
+      @pdf.ibox 0.85, 5.33, 12.57, 8.58, "CNPJ/CPF", Helper.as_cnpj_cpf(@xml['dest/CNPJ']), {:style => :bold} if @xml['dest/CNPJ'] != ''
+      @pdf.ibox 0.85, 5.33, 12.57, 8.58, "CNPJ/CPF", Helper.as_cnpj_cpf(@xml['dest/CPF']), {:style => :bold} if @xml['dest/CPF'] != ''
+      @pdf.ibox 0.85, 2.92, 17.90, 8.58, "DATA DA EMISSÃO", Helper.get_emit_date(@xml), {:style => :bold, :align => :right}
+      @pdf.ibox 0.85, 10.16, 0.25, 9.43, "ENDEREÇO", "#{@xml['enderDest/xLgr']}, #{@xml['enderDest/nro']}", {:style => :bold}
+      @pdf.ibox 0.85, 4.83, 10.41, 9.43, "BAIRRO", @xml['enderDest/xBairro'], {:style => :bold}
+      @pdf.ibox 0.85, 2.67, 15.24, 9.43, "CEP", Helper.as_cep(@xml['enderDest/CEP']), {:style => :bold}
+      @pdf.ibox 0.85, 2.92, 17.90, 9.43, "DATA DA SAÍDA/ENTRADA", Helper.get_out_date(@xml), {:style => :bold, :align => :right}
+      @pdf.ibox 0.85, 7.11, 0.25, 10.28, "MUNICÍPIO", @xml['enderDest/xMun'], {:style => :bold}
+      @pdf.ibox 0.85, 4.06, 7.36, 10.28, "FONE/FAX", Helper.as_phone_number(@xml['enderDest/fone']), {:style => :bold}
+      @pdf.ibox 0.85, 1.14, 11.42, 10.28, "UF", @xml['enderDest/UF'], {:style => :bold}
+      @pdf.ibox 0.85, 5.33, 12.56, 10.28, "INSCRIÇÃO ESTADUAL", @xml['dest/IE'], {:style => :bold}
+      @pdf.ibox 0.85, 2.92, 17.90, 10.28, "HORA DE SAÍDA", Helper.get_out_hour(@xml), {:style => :bold, :align => :right}
     end
 
     def render_faturas
@@ -113,43 +123,43 @@ module RubyDanfe
     def render_calculo_do_imposto
       @pdf.ititle 0.42, 5.60, 0.25, 12.36, "CÁLCULO DO IMPOSTO"
 
-      @pdf.inumeric 0.85, 4.06, 0.25, 12.78, "BASE DE CÁLCULO DO ICMS", @xml['ICMSTot/vBC']
-      @pdf.inumeric 0.85, 4.06, 4.31, 12.78, "VALOR DO ICMS", @xml['ICMSTot/vICMS']
-      @pdf.inumeric 0.85, 4.06, 8.37, 12.78, "BASE DE CÁLCULO DO ICMS ST", @xml['ICMSTot/vBCST']
-      @pdf.inumeric 0.85, 4.06, 12.43, 12.78, "VALOR DO ICMS ST", @xml['ICMSTot/vST']
-      @pdf.inumeric 0.85, 4.32, 16.49, 12.78, "VALOR TOTAL DOS PRODUTOS", @xml['ICMSTot/vProd']
-      @pdf.inumeric 0.85, 3.46, 0.25, 13.63, "VALOR DO FRETE", @xml['ICMSTot/vFrete']
-      @pdf.inumeric 0.85, 3.46, 3.71, 13.63, "VALOR DO SEGURO", @xml['ICMSTot/vSeg']
-      @pdf.inumeric 0.85, 3.46, 7.17, 13.63, "DESCONTO", @xml['ICMSTot/vDesc']
-      @pdf.inumeric 0.85, 3.46, 10.63, 13.63, "OUTRAS DESPESAS ACESSORIAS", @xml['ICMSTot/vOutro']
-      @pdf.inumeric 0.85, 3.46, 14.09, 13.63, "VALOR DO IPI", @xml['ICMSTot/vIPI']
-      @pdf.inumeric 0.85, 3.27, 17.55, 13.63, "VALOR TOTAL DA NOTA", @xml['ICMSTot/vNF'], :style => :bold
+      @pdf.inumeric 0.85, 4.06, 0.25, 12.78, "BASE DE CÁLCULO DO ICMS", @xml['ICMSTot/vBC'], {:style => :bold}
+      @pdf.inumeric 0.85, 4.06, 4.31, 12.78, "VALOR DO ICMS", @xml['ICMSTot/vICMS'], {:style => :bold}
+      @pdf.inumeric 0.85, 4.06, 8.37, 12.78, "BASE DE CÁLCULO DO ICMS ST", @xml['ICMSTot/vBCST'], {:style => :bold}
+      @pdf.inumeric 0.85, 4.06, 12.43, 12.78, "VALOR DO ICMS ST", @xml['ICMSTot/vST'], {:style => :bold}
+      @pdf.inumeric 0.85, 4.32, 16.49, 12.78, "VALOR TOTAL DOS PRODUTOS", @xml['ICMSTot/vProd'], {:style => :bold}
+      @pdf.inumeric 0.85, 3.46, 0.25, 13.63, "VALOR DO FRETE", @xml['ICMSTot/vFrete'], {:style => :bold}
+      @pdf.inumeric 0.85, 3.46, 3.71, 13.63, "VALOR DO SEGURO", @xml['ICMSTot/vSeg'], {:style => :bold}
+      @pdf.inumeric 0.85, 3.46, 7.17, 13.63, "DESCONTO", @xml['ICMSTot/vDesc'], {:style => :bold}
+      @pdf.inumeric 0.85, 3.46, 10.63, 13.63, "OUTRAS DESPESAS ACESSORIAS", @xml['ICMSTot/vOutro'], {:style => :bold}
+      @pdf.inumeric 0.85, 3.46, 14.09, 13.63, "VALOR DO IPI", @xml['ICMSTot/vIPI'], {:style => :bold}
+      @pdf.inumeric 0.85, 3.27, 17.55, 13.63, "VALOR TOTAL DA NOTA", @xml['ICMSTot/vNF'], {:style => :bold}
     end
 
     def render_transportadora_e_volumes
       @pdf.ititle 0.42, 10.00, 0.25, 14.48, "TRANSPORTADOR / VOLUMES TRANSPORTADOS"
 
-      @pdf.ibox 0.85, 9.02, 0.25, 14.90, "RAZÃO SOCIAL", @xml['transporta/xNome']
-      @pdf.ibox 0.85, 2.79, 9.27, 14.90, "FRETE POR CONTA", @xml['transp/modFrete'] == '0' ? ' 0 - EMITENTE' : '1 - DEST.'
-      @pdf.ibox 0.85, 1.78, 12.06, 14.90, "CODIGO ANTT", @xml['veicTransp/RNTC']
-      @pdf.ibox 0.85, 2.29, 13.84, 14.90, "PLACA DO VEÍCULO", @xml['veicTransp/placa']
-      @pdf.ibox 0.85, 0.76, 16.13, 14.90, "UF", @xml['veicTransp/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 14.90, "CNPJ/CPF", @xml['transporta/CNPJ']
-      @pdf.ibox 0.85, 9.02, 0.25, 15.75, "ENDEREÇO", @xml['transporta/xEnder']
-      @pdf.ibox 0.85, 6.86, 9.27, 15.75, "MUNICÍPIO", @xml['transporta/xMun']
-      @pdf.ibox 0.85, 0.76, 16.13, 15.75, "UF", @xml['transporta/UF']
-      @pdf.ibox 0.85, 3.94, 16.89, 15.75, "INSCRIÇÂO ESTADUAL", @xml['transporta/IE']
+      @pdf.ibox 0.85, 9.02, 0.25, 14.90, "RAZÃO SOCIAL", @xml['transporta/xNome'], {:style => :bold}
+      @pdf.ibox 0.85, 2.79, 9.27, 14.90, "FRETE POR CONTA", freight_mode(@xml['transp/modFrete']), {:style => :bold}
+      @pdf.ibox 0.85, 1.78, 12.06, 14.90, "CODIGO ANTT", @xml['veicTransp/RNTC'], {:style => :bold}
+      @pdf.ibox 0.85, 2.29, 13.84, 14.90, "PLACA DO VEÍCULO", @xml['veicTransp/placa'], {:style => :bold}
+      @pdf.ibox 0.85, 0.76, 16.13, 14.90, "UF", @xml['veicTransp/UF'], {:style => :bold}
+      @pdf.ibox 0.85, 3.94, 16.89, 14.90, "CNPJ/CPF", Helper.as_cnpj_cpf(@xml['transporta/CNPJ']), {:style => :bold}
+      @pdf.ibox 0.85, 9.02, 0.25, 15.75, "ENDEREÇO", @xml['transporta/xEnder'], {:style => :bold}
+      @pdf.ibox 0.85, 6.86, 9.27, 15.75, "MUNICÍPIO", @xml['transporta/xMun'], {:style => :bold}
+      @pdf.ibox 0.85, 0.76, 16.13, 15.75, "UF", @xml['transporta/UF'], {:style => :bold}
+      @pdf.ibox 0.85, 3.94, 16.89, 15.75, "INSCRIÇÂO ESTADUAL", @xml['transporta/IE'], {:style => :bold}
 
       @vol = 0
       @xml.collect('xmlns', 'vol') do |det|
         @vol += 1
         if @vol < 2
-          @pdf.ibox 0.85, 2.92, 0.25, 16.60, "QUANTIDADE", det.css('qVol').text
-          @pdf.ibox 0.85, 3.05, 3.17, 16.60, "ESPÉCIE", det.css('esp').text
-          @pdf.ibox 0.85, 3.05, 6.22, 16.60, "MARCA", det.css('marca').text
-          @pdf.ibox 0.85, 4.83, 9.27, 16.60, "NUMERAÇÃO"
-          @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", det.css('pesoB').text, {:decimals => 3}
-          @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", det.css('pesoL').text, {:decimals => 3}
+          @pdf.ibox 0.85, 2.92, 0.25, 16.60, "QUANTIDADE", det.css('qVol').text, {:style => :bold}
+          @pdf.ibox 0.85, 3.05, 3.17, 16.60, "ESPÉCIE", det.css('esp').text, {:style => :bold}
+          @pdf.ibox 0.85, 3.05, 6.22, 16.60, "MARCA", det.css('marca').text, {:style => :bold}
+          @pdf.ibox 0.85, 4.83, 9.27, 16.60, "NUMERAÇÃO", {:style => :bold}
+          @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", det.css('pesoB').text, {:decimals => 3}, {:style => :bold}
+          @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", det.css('pesoL').text, {:decimals => 3}, {:style => :bold}
         else
           break
         end
@@ -180,10 +190,10 @@ module RubyDanfe
     def render_calculo_do_issqn
       @pdf.ititle 0.42, 10.00, 0.25, 24.64, "CÁLCULO DO ISSQN"
 
-      @pdf.ibox 0.85, 5.08, 0.25, 25.06, "INSCRIÇÃO MUNICIPAL", @xml['emit/IM']
-      @pdf.ibox 0.85, 5.08, 5.33, 25.06, "VALOR TOTAL DOS SERVIÇOS", @xml['total/vServ']
-      @pdf.ibox 0.85, 5.08, 10.41, 25.06, "BASE DE CÁLCULO DO ISSQN", @xml['total/vBCISS']
-      @pdf.ibox 0.85, 5.28, 15.49, 25.06, "VALOR DO ISSQN", @xml['total/ISSTot']
+      @pdf.ibox 0.85, 5.08, 0.25, 25.06, "INSCRIÇÃO MUNICIPAL", @xml['emit/IM'], {:style => :bold}
+      @pdf.ibox 0.85, 5.08, 5.33, 25.06, "VALOR TOTAL DOS SERVIÇOS", @xml['total/vServ'], {:style => :bold}
+      @pdf.ibox 0.85, 5.08, 10.41, 25.06, "BASE DE CÁLCULO DO ISSQN", @xml['total/vBCISS'], {:style => :bold}
+      @pdf.ibox 0.85, 5.28, 15.49, 25.06, "VALOR DO ISSQN", @xml['total/ISSTot'], {:style => :bold}
     end
 
     def render_dados_adicionais
@@ -212,9 +222,9 @@ module RubyDanfe
           end
         end
         @pdf.ibox 2.07, 12.93, 0.25, y + 0.30, '', 'OUTRAS INFORMAÇÕES', {:size => 6, :valign => :top, :border => 0}
-        @pdf.ibox 2.07, 12.93, 0.25, y + 0.50, '', @xml['infAdic/infCpl'], {:size => 5, :valign => :top, :border => 0}
+        @pdf.ibox 2.07, 12.93, 0.25, y + 0.50, '', Helper.split_semicolon(@xml['infAdic/infCpl']), {:size => 5, :valign => :top, :border => 0}
       else
-         @pdf.ibox 3.07, 12.93, 0.25, 26.33, "INFORMAÇÕES COMPLEMENTARES", @xml['infAdic/infCpl'], {:size => 6, :valign => :top}
+         @pdf.ibox 3.07, 12.93, 0.25, 26.33, "INFORMAÇÕES COMPLEMENTARES", Helper.split_semicolon(@xml['infAdic/infCpl']), {:size => 6, :valign => :top}
       end
 
       @pdf.ibox 3.07, 7.62, 13.17, 26.33, "RESERVADO AO FISCO"
@@ -231,7 +241,7 @@ module RubyDanfe
               FCI: #{det.css('prod/nFCI').text}
               string
             else
-              descricao = det.css('prod/xProd').text
+              descricao = "#{det.css('prod/xProd').text}\n#{det.css('infAdProd').text}"
             end
 
             [
