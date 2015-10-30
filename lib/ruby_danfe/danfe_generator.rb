@@ -140,7 +140,7 @@ module RubyDanfe
       @pdf.ititle 0.42, 10.00, 0.25, 14.48, "TRANSPORTADOR / VOLUMES TRANSPORTADOS"
 
       @pdf.ibox 0.85, 9.02, 0.25, 14.90, "RAZÃO SOCIAL", @xml['transporta/xNome'], {:style => :bold}
-      @pdf.ibox 0.85, 2.79, 9.27, 14.90, "FRETE POR CONTA", freight_mode(@xml['transp/modFrete']), {:style => :bold}
+      @pdf.ibox 0.85, 2.79, 9.27, 14.90, "FRETE POR CONTA", freight_mode(Helper.remove_white_spaces(@xml['transp/modFrete'])), {:style => :bold}
       @pdf.ibox 0.85, 1.78, 12.06, 14.90, "CODIGO ANTT", @xml['veicTransp/RNTC'], {:style => :bold}
       @pdf.ibox 0.85, 2.29, 13.84, 14.90, "PLACA DO VEÍCULO", @xml['veicTransp/placa'], {:style => :bold}
       @pdf.ibox 0.85, 0.76, 16.13, 14.90, "UF", @xml['veicTransp/UF'], {:style => :bold}
@@ -157,9 +157,9 @@ module RubyDanfe
           @pdf.ibox 0.85, 2.92, 0.25, 16.60, "QUANTIDADE", det.css('qVol').text, {:style => :bold}
           @pdf.ibox 0.85, 3.05, 3.17, 16.60, "ESPÉCIE", det.css('esp').text, {:style => :bold}
           @pdf.ibox 0.85, 3.05, 6.22, 16.60, "MARCA", det.css('marca').text, {:style => :bold}
-          @pdf.ibox 0.85, 4.83, 9.27, 16.60, "NUMERAÇÃO", {:style => :bold}
-          @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", det.css('pesoB').text, {:decimals => 3}, {:style => :bold}
-          @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", det.css('pesoL').text, {:decimals => 3}, {:style => :bold}
+          @pdf.ibox 0.85, 4.83, 9.27, 16.60, "NUMERAÇÃO", det.css('nVol').text, {:style => :bold}
+          @pdf.inumeric 0.85, 3.43, 14.10, 16.60, "PESO BRUTO", det.css('pesoB').text, {:decimals => 3, :style => :bold}
+          @pdf.inumeric 0.85, 3.30, 17.53, 16.60, "PESO LÍQUIDO", det.css('pesoL').text, {:decimals => 3, :style => :bold}
         else
           break
         end
@@ -233,8 +233,8 @@ module RubyDanfe
     def render_produtos
       @pdf.font_size(6) do
         @pdf.itable 6.37, 21.50, 0.25, 18.17,
-          @xml.collect('xmlns', 'det')  { |det|
-            if !det.css('prod/nFCI').text.empty? then
+          @xml.collect('xmlns', 'det') { |det|
+            if !det.css('prod/nFCI').text.empty?
               descricao = <<-string
               #{det.css('prod/xProd').text}
 

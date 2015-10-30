@@ -24,6 +24,10 @@ module RubyDanfe
       28.7.cm - y
     end
 
+    def self.remove_white_spaces(info)
+      info.gsub(/\p{Space}/, '')
+    end
+
     def self.get_emit_date(xml)
       dh_emi = ""
       if !xml['ide/dEmi'].blank?
