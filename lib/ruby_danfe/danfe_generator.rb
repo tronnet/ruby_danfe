@@ -9,10 +9,10 @@ module RubyDanfe
 
     def freight_mode(f_type)
       case f_type
-        when "0" then "0 - Emitente"
-        when "1" then "1 - Destinatário/remetente"
-        when "2" then "2 - Terceiros"
-        when "9" then "9 - Sem frete"
+        when "0" then '0 - Emitente'
+        when "1" then '1 - Destinatário'
+        when "2" then '2 - Terceiros'
+        when "9" then '9 - Sem frete'
       end
     end
 
@@ -107,16 +107,27 @@ module RubyDanfe
 
       x = 0.25
       y = 11.51
+
+      @xml.collect('xmlns', 'fat') do |det|
+        @pdf.ibox 0.85, 2.12, x, y, '', 'Núm. Fatura:', { :size => 7, :border => 0, :style => :italic }
+        @pdf.ibox 0.85, 2.12, x + 1.60, y, '', det.css('nFat').text, { :size => 7, :border => 0, :style => :bold }
+        @pdf.ibox 0.85, 2.12, x, y + 0.20, '', 'Valor Orig.:', { :size => 7, :border => 0, :style => :italic }
+        @pdf.ibox 0.85, 2.12, x + 1.60, y + 0.20, '', ('R$ ' + Helper.numerify(det.css('vOrig').text)), { :size => 7, :border => 0, :style => :bold }
+        @pdf.ibox 0.85, 2.12, x, y + 0.40, '', 'Valor Liq.: ', { :size => 7, :border => 0, :style => :italic }
+        @pdf.ibox 0.85, 2.12, x + 1.60, y + 0.40, '', ('R$ ' + Helper.numerify(det.css('vLiq').text)), { :size => 7, :border => 0, :style => :bold }
+        x = x + 3.20
+      end
+
       @xml.collect('xmlns', 'dup') do |det|
-        @pdf.ibox 0.85, 2.12, x, y, '', 'Núm.:', { :size => 6, :border => 0, :style => :italic }
-        @pdf.ibox 0.85, 2.12, x + 0.70, y, '', det.css('nDup').text, { :size => 6, :border => 0 }
-        @pdf.ibox 0.85, 2.12, x, y + 0.20, '', 'Venc.:', { :size => 6, :border => 0, :style => :italic }
+        @pdf.ibox 0.85, 2.12, x, y, '', 'Núm. Dup.:', { :size => 7, :border => 0, :style => :italic }
+        @pdf.ibox 0.85, 2.12, x + 1.30, y, '', det.css('nDup').text, { :size => 7, :border => 0, :style => :bold }
+        @pdf.ibox 0.85, 2.12, x, y + 0.20, '', 'Vencimento:', { :size => 7, :border => 0, :style => :italic }
         dtduplicata = det.css('dVenc').text
         dtduplicata = dtduplicata[8,2] + '/' + dtduplicata[5, 2] + '/' + dtduplicata[0, 4]
-        @pdf.ibox 0.85, 2.12, x + 0.70, y + 0.20, '', dtduplicata, { :size => 6, :border => 0 }
-        @pdf.ibox 0.85, 2.12, x, y + 0.40, '', 'Valor: R$', { :size => 6, :border => 0, :style => :italic }
-        @pdf.inumeric 0.85, 1.25, x + 0.70, y + 0.40, '', det.css('vDup').text, { :size => 6, :border => 0 }
-        x = x + 2.30
+        @pdf.ibox 0.85, 2.12, x + 1.30, y + 0.20, '', dtduplicata, { :size => 7, :border => 0, :style => :bold }
+        @pdf.ibox 0.85, 2.12, x, y + 0.40, '', 'Valor:', { :size => 7, :border => 0, :style => :italic }
+        @pdf.ibox 0.85, 2.12, x + 1.30, y + 0.40, '', ('R$ ' + Helper.numerify(det.css('vDup').text)), { :size => 7, :border => 0, :style => :bold }
+        x = x + 2.80
       end
     end
 
