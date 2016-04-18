@@ -123,7 +123,7 @@ module RubyDanfe
         @pdf.ibox 0.85, 2.12, x + 1.30, y, '', det.css('nDup').text, { :size => 7, :border => 0, :style => :bold }
         @pdf.ibox 0.85, 2.12, x, y + 0.20, '', 'Vencimento:', { :size => 7, :border => 0, :style => :italic }
         dtduplicata = det.css('dVenc').text
-        dtduplicata = dtduplicata[8,2] + '/' + dtduplicata[5, 2] + '/' + dtduplicata[0, 4]
+        dtduplicata = dtduplicata.present? ? dtduplicata[8,2] + '/' + dtduplicata[5, 2] + '/' + dtduplicata[0, 4] : ""
         @pdf.ibox 0.85, 2.12, x + 1.30, y + 0.20, '', dtduplicata, { :size => 7, :border => 0, :style => :bold }
         @pdf.ibox 0.85, 2.12, x, y + 0.40, '', 'Valor:', { :size => 7, :border => 0, :style => :italic }
         @pdf.ibox 0.85, 2.12, x + 1.30, y + 0.40, '', ('R$ ' + Helper.numerify(det.css('vDup').text)), { :size => 7, :border => 0, :style => :bold }
