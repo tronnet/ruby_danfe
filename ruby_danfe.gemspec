@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "prawn", "0.11.1"
   spec.add_dependency "barby"
   spec.add_dependency "rqrcode"
-
+  
   spec.add_development_dependency "pry"
   spec.add_development_dependency "rspec", ">= 3.0.0"
   spec.add_development_dependency "simplecov"

@@ -162,14 +162,12 @@ module RubyDanfe
       data_receb = Date.parse(data).strftime('%d/%m/%Y %I:%M:%S')
       protocolo = @xml.css('nProt').text
 
-
       @pdf.ibox 3, 12, 0.9, 18.9, 'Mensagem Fiscal',
         "#{cabecalho}" + 
         "Número #{numero_nota} | Série #{serie} | Emissão #{data_emissao} - Via Consumidor" + 
         "\n \n" + "Consulte pela Chave de Acesso em sistemas.sefaz.am.gov.br/nfceweb/formConsulta.do" + 
         "\n \n" + "CHAVE DE ACESSO:" +
         "\n \n" + chave_acesso + "\n" +
-        "\n" + "Protocolo de Autorização: #{protocolo} - Data: #{data_receb}", {align: :center, :valign => :center, size: 7} 
     end
 
     def get_chave
