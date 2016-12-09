@@ -180,20 +180,21 @@ module RubyDanfe
     def render_cabecalho_dos_produtos
       @pdf.ititle 0.42, 10.00, 0.25, 17.45, "DADOS DO PRODUTO / SERVIÇO"
 
-      @pdf.ibox 6.70, 2.00, 0.25, 17.87, "CÓDIGO"
-      @pdf.ibox 6.70, 4.90, 2.25, 17.87, "DESCRIÇÃO"
-      @pdf.ibox 6.70, 1.30, 7.15, 17.87, "NCM"
-      @pdf.ibox 6.70, 0.80, 8.45, 17.87, "CST"
-      @pdf.ibox 6.70, 1.00, 9.25, 17.87, "CFOP"
-      @pdf.ibox 6.70, 1.00, 10.25, 17.87, "UNID"
-      @pdf.ibox 6.70, 1.30, 11.25, 17.87, "QUANT"
-      @pdf.ibox 6.70, 1.50, 12.55, 17.87, "VALOR UNIT"
-      @pdf.ibox 6.70, 1.50, 14.05, 17.87, "VALOR TOT"
-      @pdf.ibox 6.70, 1.50, 15.55, 17.87, "BASE CÁLC"
-      @pdf.ibox 6.70, 1.00, 17.05, 17.87, "VL ICMS"
-      @pdf.ibox 6.70, 1.00, 18.05, 17.87, "VL IPI"
-      @pdf.ibox 6.70, 0.90, 19.05, 17.87, "% ICMS"
-      @pdf.ibox 6.70, 0.86, 19.95, 17.87, "% IPI"
+      @pdf.ibox 6.70, 1.50, 0.25, 17.87, "CÓDIGO"
+      @pdf.ibox 6.70, 4.80, 1.75, 17.87, "DESCRIÇÃO"
+      @pdf.ibox 6.70, 1.00, 6.55, 17.87, "NCM"
+      @pdf.ibox 6.70, 0.80, 7.55, 17.87, "CST"
+      @pdf.ibox 6.70, 1.00, 8.35, 17.87, "CEST"
+      @pdf.ibox 6.70, 1.00, 9.35, 17.87, "CFOP"
+      @pdf.ibox 6.70, 1.00, 10.35, 17.87, "UNID"
+      @pdf.ibox 6.70, 1.30, 11.35, 17.87, "QUANT"
+      @pdf.ibox 6.70, 1.50, 12.65, 17.87, "VALOR UNIT"
+      @pdf.ibox 6.70, 1.50, 14.15, 17.87, "VALOR TOT"
+      @pdf.ibox 6.70, 1.50, 15.65, 17.87, "BASE CÁLC"
+      @pdf.ibox 6.70, 1.00, 17.15, 17.87, "VL ICMS"
+      @pdf.ibox 6.70, 1.00, 18.15, 17.87, "VL IPI"
+      @pdf.ibox 6.70, 0.90, 19.15, 17.87, "% ICMS"
+      @pdf.ibox 6.70, 0.86, 20.05, 17.87, "% IPI"
 
       @pdf.horizontal_line 0.25.cm, 20.83.cm, :at => Helper.invert(18.17.cm)
     end
@@ -261,6 +262,7 @@ module RubyDanfe
               descricao, #I04
               det.css('prod/NCM').text, #I05
               Cst.to_danfe(det), #N11
+              det.css('prod/CEST').text, 
               det.css('prod/CFOP').text, #I08
               det.css('prod/uCom').text, #I09
               Helper.numerify(det.css('prod/qCom').text), #I10
@@ -274,26 +276,27 @@ module RubyDanfe
             ]
           },
           :column_widths => {
-            0 => 2.00.cm,
-            1 => 4.90.cm,
-            2 => 1.30.cm,
+            0 => 1.50.cm,
+            1 => 4.80.cm,
+            2 => 1.00.cm,
             3 => 0.80.cm,
             4 => 1.00.cm,
             5 => 1.00.cm,
-            6 => 1.30.cm,
-            7 => 1.50.cm,
+            6 => 1.00.cm,
+            7 => 1.30.cm,
             8 => 1.50.cm,
             9 => 1.50.cm,
-            10 => 1.00.cm,
+            10 => 1.50.cm,
             11 => 1.00.cm,
-            12 => 0.90.cm,
-            13 => 0.86.cm
+            12 => 1.00.cm,
+            13 => 0.90.cm,
+            14 => 0.86.cm
           },
           :cell_style => {:padding => 2, :border_width => 0} do |table|
             @pdf.dash(5);
-            table.column(6..13).style(:align => :right)
-            table.column(0..13).border_width = 1
-            table.column(0..13).borders = [:bottom]
+            table.column(6..14).style(:align => :right)
+            table.column(0..14).border_width = 1
+            table.column(0..14).borders = [:bottom]
           end
       end
     end
