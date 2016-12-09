@@ -168,6 +168,7 @@ module RubyDanfe
         "\n \n" + "Consulte pela Chave de Acesso em sistemas.sefaz.am.gov.br/nfceweb/formConsulta.do" + 
         "\n \n" + "CHAVE DE ACESSO:" +
         "\n \n" + chave_acesso + "\n" +
+        "\n" + "Protocolo de Autorização: #{protocolo} - Data: #{data_receb}", {align: :center, :valign => :center, size: 7} 
     end
 
     def get_chave
