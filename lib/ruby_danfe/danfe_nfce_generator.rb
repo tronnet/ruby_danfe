@@ -214,6 +214,7 @@ module RubyDanfe
         case uf 
           when "AC" then return "http://www.sefaznet.ac.gov.br/nfe/NFe.jsp?opc=3" 
           when "AM" then return "http://sistemas.sefaz.am.gov.br/nfceweb/consultarNFCe.jsp?"
+          when "GO" then return "http://www.nfce.go.gov.br/post/ver/214278/consumid"
           when "MA" then return "http://www.nfce.sefaz.ma.gov.br/portal/consultarNFCe.jsp"
           when "MT" then return "http://www.sefaz.mt.gov.br/nfe/portal/consultanfce"
           when "RN" then return "http://www.nfe.rn.gov.br/portal/consultarNFCe.jsp?"
@@ -224,6 +225,7 @@ module RubyDanfe
         case uf 
           when "AC" then return "http://hml.sefaznet.ac.gov.br" 
           when "AM" then return "http://homnfe.sefaz.am.gov.br/nfceweb/consultarNFCe.jsp?"
+          when "GO" then return "http://www.nfce.go.gov.br/post/ver/214278/consumid"
           when "MA" then return "http://www.hom.nfce.sefaz.ma.gov.br/portal/consultarNFCe.jsp"
           when "MT" then return "http://www.hom.nfe.sefaz.mt.gov.br/portal/consultarNFCe.jsp"
           when "RN" then return "http://www.hom.nfe.rn.gov.br/portal/consultarNFCe.jsp?"

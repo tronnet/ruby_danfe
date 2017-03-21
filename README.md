@@ -4,6 +4,8 @@ It generates PDF files for Brazilian DANFE (_Documento Auxiliar da Nota Fiscal E
 
 It also generates Brazilian DACTE (_Documento Auxiliar do Conhecimento de Transporte Eletrônico_).
 
+It also generates Brazilian DANFE NFCE (_Documento Auxiliar da Nota Fiscal Eletrônica para Consumidor Final_).
+
 This project is inspired on [NFePHP class](http://www.assembla.com/wiki/show/nfephp/DanfeNFePHP).
 
 ## Installing
