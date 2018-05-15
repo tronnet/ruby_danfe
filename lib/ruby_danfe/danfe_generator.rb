@@ -79,7 +79,7 @@ module RubyDanfe
       @pdf.ibox 0.85, 10.02, 10.79, 6.46, "PROTOCOLO DE AUTORIZAÇÃO DE USO", "#{@xml['infProt/nProt']} - #{@xml['infProt/dhRecbto']}", {:style => :bold, :align => :center}
 
       @pdf.ibox 0.85, 6.86, 0.25, 7.31, "INSCRIÇÃO ESTADUAL", @xml['emit/IE'], {:style => :bold}
-      @pdf.ibox 0.85, 6.86, 7.11, 7.31, "INSC.ESTADUAL DO SUBST. TRIBUTÁRIO", @xml['emit/IE_ST'], {:style => :bold}
+      @pdf.ibox 0.85, 6.86, 7.11, 7.31, "INSC.ESTADUAL DO SUBST. TRIBUTÁRIO", @xml['emit/IEST'], {:style => :bold}
       @pdf.ibox 0.85, 6.84, 13.97, 7.31, "CNPJ", Helper.as_cnpj_cpf(@xml['emit/CNPJ']), {:style => :bold}
     end
 
@@ -262,7 +262,7 @@ module RubyDanfe
               descricao, #I04
               det.css('prod/NCM').text, #I05
               Cst.to_danfe(det), #N11
-              det.css('prod/CEST').text, 
+              det.css('prod/CEST').text,
               det.css('prod/CFOP').text, #I08
               det.css('prod/uCom').text, #I09
               Helper.numerify(det.css('prod/qCom').text), #I10
