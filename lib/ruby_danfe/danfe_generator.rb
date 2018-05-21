@@ -12,6 +12,7 @@ module RubyDanfe
         when "0" then '0 - Emitente'
         when "1" then '1 - Destinatário'
         when "2" then '2 - Terceiros'
+        when "3" then '3 - Transporte próprio por conta do Remetente'
         when "9" then '9 - Sem frete'
       end
     end
