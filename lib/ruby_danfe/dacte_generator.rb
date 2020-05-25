@@ -428,6 +428,7 @@ module RubyDanfe
     def render_impostos
       #informações relativas ao Imposto
       @pdf.ibox 0.40, 20.49, 0.25, 17.42, '', 'INFORMAÇÕES RELATIVAS AO IMPOSTO', { :align => :left, :size => 7, :border => 0, :style => :bold }
+      icms_tag = ''
       if !@xml['imp/ICMS/ICMS00'].eql?("")
          cst = '00 - Tributação Normal ICMS'
          tipoIcms = 'ICMS00'
@@ -440,6 +441,7 @@ module RubyDanfe
       elsif !@xml['imp/ICMS/ICMS60'].eql?("")
          cst = '60 - ICMS cobrado anteriormente por Substituição Tributária'
          tipoIcms = 'ICMS60'
+         icms_tag = 'STRet'
       elsif !@xml['imp/ICMS/ICMS90'].eql?("")
          cst = '90 - ICMS outros'
          tipoIcms = 'ICMS90'
@@ -449,38 +451,39 @@ module RubyDanfe
       else
         cst = '90 - ICMS outros'
         tipoIcms = 'ICMSOutraUF'
+        icms_tag = 'OutraUF'
       end
-      @pdf.ibox 0.90, 10.00, 0.25, 17.83, 'SITUAÇÃO TRIBUTÁRIA', cst, { :size => 7, :style => :bold }
-      @pdf.inumeric 0.90, 3.00, 10.25, 17.83, 'BASE DE CÁLCULO', @xml['imp/ICMS/'+ tipoIcms + '/vBC'], { :size => 7, :style => :bold }
-      @pdf.inumeric 0.90, 1.00, 13.25, 17.83, 'AL. ICMS', @xml[('imp/ICMS/' + tipoIcms + '/pICMS')], { :size => 7, :style => :bold }
-      @pdf.inumeric 0.90, 3.00, 14.25, 17.83, 'VALOR ICMS', @xml['imp/ICMS/' +  tipoIcms + '/vICMS'],{ :size => 7, :style => :bold }
-      @pdf.inumeric 0.90, 2.00, 17.25, 17.83, '% RED.BC.CALC.', @xml['imp/ICMS/' + tipoIcms + '/pRedBC'], { :size => 7, :style => :bold }
-      @pdf.inumeric 0.90, 1.49, 19.25, 17.83, 'ICMS ST.', @xml['imp/ICMS/' + tipoIcms + '/pRedBC'], { :size => 7, :style => :bold }
+      @pdf.ibox 0.90, 9.00, 0.25, 17.83, 'SITUAÇÃO TRIBUTÁRIA', cst, { :size => 7, :style => :bold }
+      @pdf.inumeric 0.90, 3.00, 9.25, 17.83, 'BASE DE CÁLCULO', @xml['imp/ICMS/'+ tipoIcms + '/vBC' + icms_tag], { :size => 7, :style => :bold }
+      @pdf.inumeric 0.90, 1.00, 12.25, 17.83, 'AL. ICMS', @xml[('imp/ICMS/' + tipoIcms + '/pICMS' + icms_tag)], { :size => 7, :style => :bold }
+      @pdf.inumeric 0.90, 2.00, 13.25, 17.83, 'VALOR ICMS', @xml['imp/ICMS/' +  tipoIcms + '/vICMS' + icms_tag],{ :size => 7, :style => :bold }
+      @pdf.inumeric 0.90, 2.00, 15.25, 17.83, '% RED.BC.CALC.', @xml['imp/ICMS/' + tipoIcms + '/pRedBC' + icms_tag], { :size => 7, :style => :bold }
+      @pdf.inumeric 0.90, 3.49, 17.25, 17.83, 'VALOR TOTAL DOS TRIBUTOS', @xml['imp/vTotTrib'], { :size => 7, :style => :bold }
     end
 
     def render_documentos_originarios
       #documentos originários
       @pdf.ibox 0.40, 20.49, 0.25, 18.73, '', 'DOCUMENTOS ORIGINÁRIOS', { :align => :left, :size => 7, :style => :bold, :border => 0 }
-      @pdf.ibox 5.52, 2.25, 0.25, 19.13, 'TP DOC.', '', { :size => 7}
-      @pdf.ibox 5.52, 4.00, 2.50, 19.13, 'CNPJ/CPF EMITENTE', '', { :size => 7}
-      @pdf.ibox 5.52, 1.50, 6.50, 19.13, 'SÉRIE', '', { :size => 7}
-      @pdf.ibox 5.52, 2.50, 8.00, 19.13, 'Nº DOCUMENTO', '', { :size => 7}
-      @pdf.ibox 5.52, 2.25, 10.50, 19.13, 'TP DOC.', '', { :size => 7}
-      @pdf.ibox 5.52, 4.00, 12.75, 19.13, 'CNPJ/CPF EMITENTE', '', { :size => 7}
-      @pdf.ibox 5.52, 1.50, 16.75, 19.13, 'SÉRIE', '', { :size => 7}
-      @pdf.ibox 5.52, 2.50, 18.24, 19.13, 'Nº DOCUMENTO', '', { :size => 7}
+      @pdf.ibox 5.52, 6.25, 0.25, 19.13, 'CHAVE', '', { :size => 7}
+      @pdf.ibox 5.52, 1.50, 6.50, 19.13, 'Nº DOC.', '', { :size => 7}
+      @pdf.ibox 5.52, 2.50, 8.00, 19.13, 'DATA DE EMISSÃO', '', { :size => 7}
+      @pdf.ibox 5.52, 6.25, 10.50, 19.13, 'CHAVE', '', { :size => 7}
+      @pdf.ibox 5.52, 1.50, 16.75, 19.13, 'Nº DOC.', '', { :size => 7}
+      @pdf.ibox 5.52, 2.50, 18.24, 19.13, 'DATA DE EMISSÃO', '', { :size => 7}
       x = 0.25
-      @xml.collect('xmlns', 'infNF') { |det|
-        @pdf.ibox 5.52, 2.25, x, 19.43, '', det.css('mod').text, { :size => 7, :border => 0, :style => :bold }
-        x = x + 2.25
-        @pdf.ibox 5.52, 2.25, x, 19.43, '', @xml['rem/CNPJ'][0,2] + '.' + @xml['rem/CNPJ'][2,3] + '.' +@xml['rem/CNPJ'][5,3] + '/' + @xml['rem/CNPJ'][8,4] + '-' + @xml['rem/CNPJ'][12,2], { :size => 7, :border => 0, :style => :bold } if @xml['rem/CNPJ'] != ''
-        @pdf.ibox 5.52, 2.25, x, 19.43, '', @xml['rem/CPF'][0,3] + '.' + @xml['rem/CPF'][3,3] + '.' +@xml['rem/CPF'][6,3] + '-' + @xml['rem/CPF'][9,2], { :size => 7, :border => 0, :style => :bold } if @xml['rem/CPF'] != ''
-        x = x + 4.00
-        @pdf.ibox 5.52, 2.25, x, 19.43, '', det.css('serie').text, { :size => 7, :border => 0, :style => :bold }
+      @xml.collect('xmlns', 'infNFe') { |det|
+        chave = det.css('chave').text
+        @pdf.ibox 5.52, 6.25, x, 19.43, '', det.css('chave').text, { :size => 7, :border => 0, :style => :bold }
+        x = x + 6.25
+        @pdf.ibox 5.52, 2.25, x, 19.43, '', chave[25..33], { :size => 7, :border => 0, :style => :bold }
         x = x + 1.50
-        @pdf.ibox 5.52, 2.25, x, 19.43, '', det.css('nDoc').text, { :size => 7, :border => 0, :style => :bold }
+        @pdf.ibox 5.52, 2.25, x, 19.43, '', format_date(chave), { :size => 7, :border => 0, :style => :bold }
         x = x + 2.50
       }
+    end
+
+    def format_date(key)
+      "#{key[4..5]}/20#{key[2..3]}"
     end
 
     def render_observacoes
