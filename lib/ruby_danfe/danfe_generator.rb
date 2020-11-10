@@ -268,7 +268,7 @@ module RubyDanfe
               det.css('prod/CFOP').text, #I08
               det.css('prod/uCom').text, #I09
               Helper.numerify(det.css('prod/qCom').text), #I10
-              Helper.numerify(det.css('prod/vUnCom').text), #I10a
+              Helper.numerify((det.css('prod/vUnCom').text), 4), #I10a
               Helper.numerify(det.css('prod/vProd').text), #I11
               Helper.numerify(det.css('ICMS/*/vBC').text), #N15
               Helper.numerify(det.css('ICMS/*/vICMS').text), #N17
